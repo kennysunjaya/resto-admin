@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import SubmitButton from "../components/SubmitButton";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Toastify from "toastify-js";
-
 
 export default function Image() {
   const [cuisine, setCuisine] = useState({});
   const { id } = useParams();
+  const navigate = useNavigate();
 
   async function fetchData() {
     try {
@@ -22,16 +22,18 @@ export default function Image() {
     }
   }
 
-  async function handleUpload (file) { 
+  async function handleUpload(file) {
     try {
-      const form = new FormData()
-      form.append('file', file)
+      const form = new FormData();
+      form.append("file", file);
 
-      const { data } = await axios.patch(`https://h8-phase2-gc.vercel.app/apis/restaurant-app/cuisines/${id}`, form , { headers : { 
-        Authorization : `Bearer ${localStorage.access_token}`
-      }})
+      const { data } = await axios.patch(`https://h8-phase2-gc.vercel.app/apis/restaurant-app/cuisines/${id}`, form, {
+        headers: {
+          Authorization: `Bearer ${localStorage.access_token}`,
+        },
+      });
 
-      fetchData()
+      navigate("/");
       Toastify({
         text: data.message,
         duration: 3000,
@@ -45,10 +47,8 @@ export default function Image() {
         },
         onClick: function () {}, // Callback after click
       }).showToast();
-      
     } catch (error) {
       console.log(error);
-      
     }
   }
 
@@ -70,11 +70,14 @@ export default function Image() {
             </div>
             <hr className="w-5/6 h-px bg-gray-800 border-0 mb-6 mx-auto" />
             {/* Form */}
-            <form className="flex flex-col items-center" onSubmit={(e) => { 
-              e.preventDefault()
-              const file = document.getElementById(`upload${id}`).files[0];
-              handleUpload(file);
-            }}>
+            <form
+              className="flex flex-col items-center"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const file = document.getElementById(`upload${id}`).files[0];
+                handleUpload(file);
+              }}
+            >
               <div className="w-full mb-4">
                 <label className="font-serif text-lg block mb-2" htmlFor="currentImage">
                   Current Image
@@ -86,7 +89,7 @@ export default function Image() {
                 <label className="font-serif text-lg block mb-2" htmlFor={`upload${id}`}>
                   Upload New Image
                 </label>
-                <input type="file" id={`upload${id}`} className="font-serif bg-white text-black px-2 py-1 border-2 border-black rounded-lg w-full cursor-pointer" onChange={(e) => handleUpload(e.target.files[0])}/>
+                <input type="file" id={`upload${id}`} className="font-serif bg-white text-black px-2 py-1 border-2 border-black rounded-lg w-full cursor-pointer" onChange={(e) => handleUpload(e.target.files[0])} />
               </div>
               {/* Submit Button */}
               <SubmitButton />
